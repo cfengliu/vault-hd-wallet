@@ -1,4 +1,4 @@
-package main
+package path
 
 import (
 	"github.com/hashicorp/vault/sdk/framework"
@@ -12,10 +12,12 @@ func Backend(conf *logical.BackendConfig) (*PluginBackend, error) {
 		Help: "",
 		Paths: framework.PathAppend(
 			AccountPaths(&b),
+			WalletPaths(&b),
 		),
 		PathsSpecial: &logical.Paths{
 			SealWrapStorage: []string{
 				"accounts/",
+				"wallet/",
 			},
 		},
 		Secrets:     []*framework.Secret{},

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"vault-hd-wallet/path"
 
 	"github.com/hashicorp/vault/api"
 	"github.com/hashicorp/vault/sdk/plugin"
@@ -17,7 +18,7 @@ func main() {
 	tlsProviderFunc := api.VaultPluginTLSProvider(tlsConfig)
 
 	err := plugin.Serve(&plugin.ServeOpts{
-		BackendFactoryFunc: Factory,
+		BackendFactoryFunc: path.Factory,
 		TLSProviderFunc:    tlsProviderFunc,
 	})
 

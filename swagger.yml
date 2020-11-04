@@ -1,0 +1,415 @@
+swagger: '2.0'
+host: '61.66.218.224:31010'
+basePath: /
+schemes:
+  - https
+  - http
+info:
+  title: vault-hd-wallet api
+  version: 0.0.1
+securityDefinitions:
+  jwt:
+    type: apiKey
+    name: Authorization
+    in: header
+    x-keyPrefix: 'Bearer '
+security:
+  - jwt: []
+tags: []
+paths:
+  '/accounts':
+    get:
+      summary: 列出目前產生的身分名稱
+      operationId: getAccounts
+      description: 列出目前產生的身分名稱，管理員使用
+      tags:
+        - accounts
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model1'
+          description: Successful
+  '/accounts/{name}':
+    get:
+      summary: 查詢區塊鏈身分
+      operationId: getAccountName
+      description: 查詢身份的區塊鏈位址
+      parameters:
+        - type: string
+          description: 欲查詢之身分名稱
+          name: name
+          in: path
+          required: true
+      tags:
+        - accounts
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model2'
+          description: Successful
+    post:
+      summary: 新增區塊鏈身分
+      operationId: postAccountName
+      description: 建立私鑰及對應的身分名稱
+      parameters:
+        - type: string
+          description: 欲新增之身分名稱
+          name: name
+          in: path
+          required: true
+      tags:
+        - account
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model11'
+          description: Successful
+    delete:
+      summary: 刪除區塊鏈身分
+      operationId: deleteAccountName
+      description: 刪除已建立的私鑰及身分
+      parameters:
+        - type: string
+          description: 欲刪除之身分名稱
+          name: name
+          in: path
+          required: true
+      tags:
+        - account
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model14'
+          description: Successful
+  '/hash/{docMasterKey}':
+    get:
+      summary: 查詢文件雜湊值
+      operationId: getHashDocmasterkey
+      description: 透過上鏈時的編號查詢雜湊值
+      parameters:
+        - type: string
+          description: 文件的唯一編號
+          name: docMasterKey
+          in: path
+          required: true
+      tags:
+        - hash
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model3'
+          description: Successful
+  '/issuer/{name}':
+    get:
+      summary: 查詢存證權限
+      operationId: getIssuerName
+      description: 確認該身分是否有執行存證之權限。
+      parameters:
+        - type: string
+          description: 欲確認存證功能之身分
+          name: name
+          in: path
+          required: true
+      tags:
+        - issuer
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model4'
+          description: Successful
+  '/txStatus/{txHash}':
+    get:
+      summary: 確認區塊鏈交易上鏈狀態
+      operationId: getTxstatusTxhash
+      description: 傳入交易序號，以確認區塊鏈交易上鏈狀態
+      parameters:
+        - type: string
+          description: 欲查詢之交易雜湊值
+          name: txHash
+          in: path
+          required: true
+      tags:
+        - txStatus
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model5'
+          description: Successful
+  /contract:
+    post:
+      summary: 佈署存證合約
+      operationId: postContract
+      description: 將存證合約佈署至區塊鏈，須先執行此API才能進行存證。
+      tags:
+        - contract
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model6'
+          description: Successful
+  /hash:
+    post:
+      summary: 文件雜湊值上鏈
+      operationId: postHash
+      description: 將電子文件主鍵和電子文件雜湊值上鏈，回傳為區塊鏈交易序號，可查詢是否上鏈完畢
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/Model7'
+      tags:
+        - hash
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model8'
+          description: Successful
+  /issuer:
+    post:
+      summary: 授予存證權限
+      operationId: postIssuer
+      description: 在智慧合約中授權該身份可執行存證功能，只有管理員可以進行授權。
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/Model9'
+      tags:
+        - issuer
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model6'
+          description: Successful
+    delete:
+      summary: 刪除存證權限
+      operationId: deleteIssuer
+      description: 在智慧合約中刪除該身份執行存證功能，只有管理員可執行。
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/Model12'
+      tags:
+        - issuer
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model13'
+          description: Successful
+  /verification:
+    post:
+      summary: 身分驗證
+      operationId: postVerification
+      description: 使用憑證進行身分驗證並取得金鑰
+      parameters:
+        - type: file
+          description: 驗證用的X.509格式證書
+          x-meta:
+            swaggerType: file
+          in: formData
+          name: cert
+          required: true
+        - type: file
+          description: 驗證身份文件的簽章
+          x-meta:
+            swaggerType: file
+          in: formData
+          name: signature
+          required: true
+        - type: file
+          description: 身分文件，須包含身分名及時間戳，格式為XML
+          x-meta:
+            swaggerType: file
+          in: formData
+          name: content
+          required: true
+      consumes:
+        - multipart/form-data
+      tags:
+        - verification
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model10'
+          description: Successful
+  /hash/revoke:
+    patch:
+      summary: 註銷文件雜湊值
+      operationId: patchHashRevoke
+      description: 將電子文件雜湊值進行註銷，回傳為區塊鏈交易序號，可查詢是否註銷完成
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/Model15'
+      tags:
+        - hash
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Model16'
+          description: Successful
+definitions:
+  accounts:
+    type: array
+    example:
+      - judicial
+      - tpdc
+    items:
+      type: string
+      description: 身分名稱
+      example: 法院1
+  Model1:
+    type: object
+    properties:
+      accounts:
+        $ref: '#/definitions/accounts'
+  Model2:
+    type: object
+    properties:
+      address:
+        type: string
+        description: 私鑰對應的區塊鏈地址
+        example: '0x04f97dD6C0c7C0B836Fe9189710a933df89f12e8'
+  Model3:
+    type: object
+    properties:
+      hashValue:
+        type: string
+        description: 電子文件雜湊值
+        example: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+      revocation:
+        type: boolean
+        description: 是否已經被註銷
+        example: 'false'
+  Model4:
+    type: object
+    properties:
+      isIssuer:
+        type: boolean
+        description: 用來查詢交易是否完成。
+        example: ture
+  Model5:
+    type: object
+    properties:
+      status:
+        type: number
+        description: 交易狀態
+        example: 1
+      message:
+        type: string
+        description: 狀態訊息
+        example: success
+  Model6:
+    type: object
+    properties:
+      txHash:
+        type: string
+        description: 用來查詢交易是否完成。
+        example: '0x9bc416fbb74e6894c18ce79c7feda294c58e85e500ddbd9978df30e79951e63a'
+  Model7:
+    type: object
+    properties:
+      docMasterKey:
+        type: string
+        description: 文件的唯一編號
+        example: DOC200323
+      hashValue:
+        type: string
+        description: 電子文件雜湊值
+        example: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+        x-constraint:
+          length: 64
+    required:
+      - docMasterKey
+      - hashValue
+  Model8:
+    type: object
+    properties:
+      txHash:
+        type: string
+        description: 區塊鏈上的交易序號，可用來查詢交易是否完成。
+        example: '0x9bc416fbb74e6894c18ce79c7feda294c58e85e500ddbd9978df30e79951e63a'
+      txUrl:
+        type: string
+        description: 區塊鏈的交易序號瀏覽器網址
+        example: 'https://127.0.0.1/explorer/Transaction/hash=0xf6506b56ef907d190cb10485f45c3a7f735b675d3ed50a766385398208b57445'
+      txUrlQrCode:
+        type: string
+        description: 區塊鏈的交易序號瀏覽器網址QR Code
+        example: 'data:image/png;base64,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'
+  Model9:
+    type: object
+    properties:
+      issuer:
+        type: string
+        description: 欲新增存證功能之身分
+        example: tpdc
+    required:
+      - issuer
+  Model10:
+    type: object
+    properties:
+      token:
+        type: string
+        description: 包含id資訊的jwt token
+  Model11:
+    type: object
+    properties:
+      name:
+        type: string
+        description: 新增之身分名稱
+        example: 法院1
+      address:
+        type: string
+        description: 私鑰對應的區塊鏈地址
+        example: '0x04f97dD6C0c7C0B836Fe9189710a933df89f12e8'
+    required:
+      - name
+      - address
+  Model12:
+    type: object
+    properties:
+      issuer:
+        type: string
+        description: 欲刪除存證功能之身分
+        example: tpdc
+    required:
+      - issuer
+  Model13:
+    type: object
+    properties:
+      txHash:
+        type: string
+        description: 類似區塊鏈上的發票號碼，可用來查詢交易是否完成。
+        example: '0x9bc416fbb74e6894c18ce79c7feda294c58e85e500ddbd9978df30e79951e63a'
+  Model14:
+    type: object
+    properties:
+      name:
+        type: string
+        description: 刪除之身分名稱
+        example: 法院1
+      address:
+        type: string
+        description: 私鑰對應的區塊鏈地址
+        example: '0x04f97dD6C0c7C0B836Fe9189710a933df89f12e8'
+    required:
+      - name
+  Model15:
+    type: object
+    properties:
+      docMasterKey:
+        type: string
+        description: 文件的唯一編號
+        example: DOC200323
+    required:
+      - docMasterKey
+  Model16:
+    type: object
+    properties:
+      txHash:
+        type: string
+        description: 區塊鏈上的交易序號，可用來查詢交易是否完成。
+        example: '0x9bc416fbb74e6894c18ce79c7feda294c58e85e500ddbd9978df30e79951e63a'
