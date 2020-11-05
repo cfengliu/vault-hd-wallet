@@ -5,17 +5,19 @@ import (
 	"errors"
 	"path"
 
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
-type Account accounts.Account
+type Account struct {
+	Address string `json:"address"`
+	URL     string `json:"url"`
+}
 
 func ReadAccount(ctx context.Context, req *logical.Request) (*Account, error) {
 
-	storagePath, _ := path.Split(req.Path)
+	accountPath := path.Dir(req.Path)
 
-	entry, err := req.Storage.Get(ctx, storagePath)
+	entry, err := req.Storage.Get(ctx, accountPath)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +28,7 @@ func ReadAccount(ctx context.Context, req *logical.Request) (*Account, error) {
 	var account *Account
 	err = entry.DecodeJSON(&account)
 	if err != nil {
-		return nil, errors.New("Fail to decode wallet to JSON format")
+		return nil, errors.New("Fail to decode account to JSON format")
 	}
 
 	return account, nil

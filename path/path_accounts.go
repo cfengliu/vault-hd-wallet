@@ -103,7 +103,7 @@ func (b *PluginBackend) createAccount(ctx context.Context, req *logical.Request,
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"address": account.Address.Hex(),
+			"address": account.Address,
 		},
 	}, nil
 }
@@ -117,7 +117,7 @@ func (b *PluginBackend) readAddress(ctx context.Context, req *logical.Request, d
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"address": account.Address.Hex(),
+			"address": account.Address,
 		},
 	}, nil
 }
@@ -131,7 +131,7 @@ func (b *PluginBackend) readDerivationPath(ctx context.Context, req *logical.Req
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"derivation_path": account.URL.Path,
+			"derivation_path": account.URL,
 		},
 	}, nil
 }

@@ -1,5 +1,10 @@
-FROM golang:alpine3.10
+FROM golang:1.14-alpine
+RUN apk add --update alpine-sdk
+RUN apk update && apk add git openssh gcc musl-dev linux-headers
+
 WORKDIR /root
 COPY ./ ./
-RUN CGO_ENABLED=0 go build -o plugin/hdwallet *.go
+RUN go mod download
+
+RUN CGO_ENABLED=1 GOOS=linux go build -a -v -i -o plugin/hdwallet *.go
 CMD ["sleep","10m"]

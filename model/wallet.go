@@ -16,8 +16,8 @@ import (
 )
 
 type Wallet struct {
-	masterKey *hdkeychain.ExtendedKey
-	seed      []byte
+	MasterKey string `json:"masterKey"`
+	Seed      []byte `json:"seed"`
 }
 
 // NewWalletFromMnemonic Generate wallet from mnemonic
@@ -31,7 +31,7 @@ func NewWalletFromMnemonic(mnemonic string, passphrase string) (*Wallet, error) 
 		return nil, errors.New("mnemonic is invalid")
 	}
 
-	seed, err := NewSeedFromMnemonic(mnemonic)
+	seed, err := NewSeedFromMnemonic(mnemonic, passphrase)
 	if err != nil {
 		return nil, err
 	}
@@ -50,19 +50,21 @@ func newWallet(seed []byte) (*Wallet, error) {
 		return nil, err
 	}
 
+	masterKeyStr := masterKey.String()
+
 	return &Wallet{
-		masterKey: masterKey,
-		seed:      seed,
+		MasterKey: masterKeyStr,
+		Seed:      seed,
 	}, nil
 }
 
 // NewSeedFromMnemonic returns a BIP-39 seed based on a BIP-39 mnemonic.
-func NewSeedFromMnemonic(mnemonic string) ([]byte, error) {
+func NewSeedFromMnemonic(mnemonic string, passphrase string) ([]byte, error) {
 	if mnemonic == "" {
 		return nil, errors.New("mnemonic is required")
 	}
 
-	return bip39.NewSeedWithErrorChecking(mnemonic, "")
+	return bip39.NewSeedWithErrorChecking(mnemonic, passphrase)
 }
 
 func ReadWallet(ctx context.Context, req *logical.Request) (*Wallet, error) {
@@ -92,18 +94,22 @@ func ReadWallet(ctx context.Context, req *logical.Request) (*Wallet, error) {
 func (w *Wallet) Derive(path accounts.DerivationPath) (*Account, error) {
 
 	address, err := w.deriveAddress(path)
+	addressStr := address.String()
 
 	// If an error occurred or no pinning was requested, return
 	if err != nil {
 		return &Account{}, err
 	}
 
+	URL := accounts.URL{
+		Scheme: "",
+		Path:   path.String(),
+	}
+	URLStr := URL.String()
+
 	account := &Account{
-		Address: address,
-		URL: accounts.URL{
-			Scheme: "",
-			Path:   path.String(),
-		},
+		Address: addressStr,
+		URL:     URLStr,
 	}
 
 	return account, nil
@@ -112,7 +118,11 @@ func (w *Wallet) Derive(path accounts.DerivationPath) (*Account, error) {
 // DerivePrivateKey derives the private key of the derivation path.
 func (w *Wallet) derivePrivateKey(path accounts.DerivationPath) (*ecdsa.PrivateKey, error) {
 	var err error
-	key := w.masterKey
+	key, err := hdkeychain.NewKeyFromString(w.MasterKey)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, n := range path {
 		key, err = key.Child(n)
 		if err != nil {

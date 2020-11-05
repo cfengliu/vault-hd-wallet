@@ -72,7 +72,7 @@ func (b *PluginBackend) createWallet(ctx context.Context, req *logical.Request, 
 		return nil, err
 	}
 
-	entry, err := logical.StorageEntryJSON(req.Path, *wallet)
+	entry, err := logical.StorageEntryJSON(req.Path, wallet)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,6 @@ func (b *PluginBackend) createWallet(ctx context.Context, req *logical.Request, 
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"mnemonic": mnemonic,
-			"wallet":   *wallet,
 		},
 	}, nil
 
@@ -100,7 +99,7 @@ func (b *PluginBackend) readWallet(ctx context.Context, req *logical.Request, da
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"wallet": *wallet,
+			"wallet": wallet,
 		},
 	}, nil
 
