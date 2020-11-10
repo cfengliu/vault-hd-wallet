@@ -10,6 +10,7 @@ import (
 	"github.com/btcsuite/btcutil/hdkeychain"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/tyler-smith/go-bip39"
@@ -107,12 +108,60 @@ func (w *Wallet) Derive(path accounts.DerivationPath) (*Account, error) {
 	}
 	URLStr := URL.String()
 
+	privateKey, err := w.derivePrivateKey(path)
+	pritvateKeyStr := privateKeyHex(privateKey)
+
+	publicKey, err := w.derivePublicKey(path)
+	publicKeyStr := publicKeyHex(publicKey)
+
 	account := &Account{
-		Address: addressStr,
-		URL:     URLStr,
+		Address:    addressStr,
+		URL:        URLStr,
+		PrivateKey: pritvateKeyStr,
+		PublicKey:  publicKeyStr,
 	}
 
 	return account, nil
+}
+
+// PrivateKeyBytes returns the ECDSA private key in bytes format of the account.
+func privateKeyBytes(privateKey *ecdsa.PrivateKey) []byte {
+	return crypto.FromECDSA(privateKey)
+}
+
+// PrivateKeyHex return the ECDSA private key in hex string format of the account.
+func privateKeyHex(privateKey *ecdsa.PrivateKey) string {
+	privateKeyBytes := privateKeyBytes(privateKey)
+
+	return hexutil.Encode(privateKeyBytes)[2:]
+}
+
+// PublicKeyBytes returns the ECDSA public key in bytes format of the account.
+func publicKeyBytes(publicKey *ecdsa.PublicKey) []byte {
+	return crypto.FromECDSAPub(publicKey)
+}
+
+// PublicKeyHex return the ECDSA public key in hex string format of the account.
+func publicKeyHex(publicKey *ecdsa.PublicKey) string {
+	publicKeyBytes := publicKeyBytes(publicKey)
+
+	return hexutil.Encode(publicKeyBytes)[4:]
+}
+
+// ParseDerivationPath parses the derivation path in string format into []uint32
+func ParseDerivationPath(path string) (accounts.DerivationPath, error) {
+	return accounts.ParseDerivationPath(path)
+}
+
+// MustParseDerivationPath parses the derivation path in string format into
+// []uint32 but will panic if it can't parse it.
+func MustParseDerivationPath(path string) accounts.DerivationPath {
+	parsed, err := accounts.ParseDerivationPath(path)
+	if err != nil {
+		panic(err)
+	}
+
+	return parsed
 }
 
 // DerivePrivateKey derives the private key of the derivation path.

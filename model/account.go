@@ -9,8 +9,10 @@ import (
 )
 
 type Account struct {
-	Address string `json:"address"`
-	URL     string `json:"url"`
+	Address    string `json:"address"`
+	URL        string `json:"url"`
+	PrivateKey string `json:"privateKey"`
+	PublicKey  string `json:"publicKey"`
 }
 
 func ReadAccount(ctx context.Context, req *logical.Request) (*Account, error) {

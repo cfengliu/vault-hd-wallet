@@ -4,7 +4,6 @@ RUN apk update && apk add git openssh gcc musl-dev linux-headers
 
 WORKDIR /root
 COPY ./ ./
-RUN go mod download
 
 RUN CGO_ENABLED=1 GOOS=linux go build -a -v -i -o plugin/hdwallet *.go
 CMD ["sleep","10m"]
