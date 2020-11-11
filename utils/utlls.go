@@ -41,3 +41,7 @@ func ValidNumber(input string) *big.Int {
 	amount := math.MustParseBig256(input)
 	return amount.Abs(amount)
 }
+
+func ErrorHandler(errorType string, err error) error {
+	return fmt.Errorf("error occurs at %s : %s", errorType, err.Error())
+}

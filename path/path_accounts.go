@@ -149,10 +149,13 @@ func (b *PluginBackend) createAccount(ctx context.Context, req *logical.Request,
 
 	derivationPathField, err := dataWrapper.MustGetString("derivationPath")
 	if err != nil {
-		return nil, err
+		return nil, utils.ErrorHandler("derivationPathField", err)
 	}
 
 	wallet, err := model.ReadWallet(ctx, req)
+	if err != nil {
+		return nil, err
+	}
 
 	derivationPath, err := hdwallet.ParseDerivationPath(derivationPathField)
 	if err != nil {
