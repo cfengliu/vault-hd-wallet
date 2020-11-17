@@ -34,7 +34,7 @@ func WalletPaths(b *PluginBackend) []*framework.Path {
 					Callback: b.createWallet,
 					Summary:  "Generate or import mnemonic",
 				},
-				// TODO: should be removed before production
+				// TODO: For testing only. Should be removed before usage.
 				logical.ReadOperation: &framework.PathOperation{
 					Callback: b.readWallet,
 					Summary:  "print wallet(for testing)",
