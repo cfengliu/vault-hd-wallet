@@ -7,6 +7,7 @@ import (
 	"vault-hd-wallet/model"
 	"vault-hd-wallet/utils"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -225,7 +226,10 @@ func (b *PluginBackend) signTransaction(ctx context.Context, req *logical.Reques
 		return nil, err
 	}
 
-	nonce := dataWrapper.GetUint64("nonce", 0)
+	nonce, err := dataWrapper.MustGetUint64("nonce")
+	if err != nil {
+		return nil, err
+	}
 
 	gasLimit, err := dataWrapper.MustGetUint64("gas_limit")
 	if err != nil {
@@ -243,6 +247,9 @@ func (b *PluginBackend) signTransaction(ctx context.Context, req *logical.Reques
 	}
 
 	account, err := model.ReadAccount(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("account %s is not existed", req.Path)
+	}
 
 	privateKey, err := crypto.HexToECDSA(account.PrivateKey)
 	if err != nil {
@@ -305,14 +312,9 @@ func (b *PluginBackend) signData(ctx context.Context, req *logical.Request, data
 	}
 	defer utils.ZeroKey(privateKey)
 
-	dataToSign, err := hexutil.Decode(inputData)
-	if err != nil {
-		return nil, err
-	}
+	dataHash := accounts.TextHash([]byte(inputData))
 
-	dataHash := crypto.Keccak256Hash(dataToSign)
-
-	signature, err := crypto.Sign(dataHash.Bytes(), privateKey)
+	signature, err := crypto.Sign(dataHash, privateKey)
 	if err != nil {
 		return nil, err
 	}
