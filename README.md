@@ -150,7 +150,7 @@ Parameters
 | Name | Type   | In   | Description                                                                                |
 | ---- | ------ | ---- | ------------------------------------------------------------------------------------------ |
 | name | string | url  | **Rquired.** The path of secrets engines where plugin store the account info.              |
-| data | string | body | **Rquired.** The data to be signed |
+| data | string | body | **Rquired.** The data to be signed. (without `\x19Ethereum Signed Message:\n` prefix ) |
 
 
 Code samples

@@ -7,7 +7,6 @@ import (
 	"vault-hd-wallet/model"
 	"vault-hd-wallet/utils"
 
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -312,9 +311,9 @@ func (b *PluginBackend) signData(ctx context.Context, req *logical.Request, data
 	}
 	defer utils.ZeroKey(privateKey)
 
-	dataHash := accounts.TextHash([]byte(inputData))
+	dataHash := crypto.Keccak256Hash([]byte(inputData))
 
-	signature, err := crypto.Sign(dataHash, privateKey)
+	signature, err := crypto.Sign(dataHash.Bytes(), privateKey)
 	if err != nil {
 		return nil, err
 	}
