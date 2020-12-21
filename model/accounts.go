@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
+// Account is derived from seed
 type Account struct {
 	Address    string `json:"address"`
 	URL        string `json:"url"`
@@ -15,6 +16,7 @@ type Account struct {
 	PublicKey  string `json:"publicKey"`
 }
 
+// ReadAccount returns the account JSON
 func ReadAccount(ctx context.Context, req *logical.Request) (*Account, error) {
 
 	accountPath := path.Dir(req.Path)

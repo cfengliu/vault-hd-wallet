@@ -16,6 +16,7 @@ import (
 	"github.com/tyler-smith/go-bip39"
 )
 
+// Wallet stores the seed of wallet
 type Wallet struct {
 	MasterKey string `json:"masterKey"`
 	Seed      []byte `json:"seed"`
@@ -68,6 +69,7 @@ func NewSeedFromMnemonic(mnemonic string, passphrase string) ([]byte, error) {
 	return bip39.NewSeedWithErrorChecking(mnemonic, passphrase)
 }
 
+// ReadWallet returns wallet JSON (for DEV only)
 func ReadWallet(ctx context.Context, req *logical.Request) (*Wallet, error) {
 
 	walletPath := "wallet"
