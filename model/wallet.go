@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"crypto/ecdsa"
+	"encoding/hex"
 	"errors"
 	"fmt"
 
@@ -19,7 +20,7 @@ import (
 // Wallet stores the seed of wallet
 type Wallet struct {
 	MasterKey string `json:"masterKey"`
-	Seed      []byte `json:"seed"`
+	Seed      string `json:"seed"`
 }
 
 // NewWalletFromMnemonic Generate wallet from mnemonic
@@ -51,12 +52,13 @@ func newWallet(seed []byte) (*Wallet, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	masterKeyStr := masterKey.String()
+
+	seedHexEncoded := hex.EncodeToString(seed)
 
 	return &Wallet{
 		MasterKey: masterKeyStr,
-		Seed:      seed,
+		Seed:      seedHexEncoded,
 	}, nil
 }
 
