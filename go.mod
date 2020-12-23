@@ -13,7 +13,7 @@ require (
 	github.com/hashicorp/vault/sdk v0.1.13
 	github.com/miguelmota/go-ethereum-hdwallet v0.0.0-20200123000308-a60dcd172b4c
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/stretchr/testify v1.6.1 // indirect
+	github.com/stretchr/testify v1.6.1
 	github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef
 	golang.org/x/net v0.0.0-20200625001655-4c5254603344 // indirect
 	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1 // indirect
